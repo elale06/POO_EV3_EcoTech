@@ -6,6 +6,7 @@ password = 'V3ntana.13'
 db = 'ecotech'
 
 def agregar(proyecto):
+    # Inserta un proyecto y devuelve su identificador generado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -26,6 +27,7 @@ def agregar(proyecto):
             con.desconectar()
 
 def editar(proyecto):
+    # Actualiza los datos de un proyecto existente
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -49,6 +51,7 @@ def editar(proyecto):
             con.desconectar()
 
 def eliminar(proyecto_id):
+    # Elimina un proyecto y devuelve si la operación tuvo efecto
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -65,6 +68,7 @@ def eliminar(proyecto_id):
             con.desconectar()
 
 def mostrarTodos():
+    # Obtiene todos los proyectos ordenados por identificador
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -82,6 +86,7 @@ def mostrarTodos():
             con.desconectar()
 
 def consultaParticular(proyecto_id):
+    # Obtiene un proyecto específico por ID
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -100,6 +105,7 @@ def consultaParticular(proyecto_id):
 
 
 def existe_proyecto(proyecto_id):
+    # Comprueba si existe el proyecto indicado
     con = None
     try:
         con = Conexion(host, user, password, db)

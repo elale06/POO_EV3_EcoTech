@@ -6,6 +6,7 @@ password = 'V3ntana.13'
 db = 'ecotech'
 
 def agregar(registro):
+    # Guarda horas trabajadas asociadas a empleado y proyecto
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -32,6 +33,7 @@ def agregar(registro):
             con.desconectar()
 
 def mostrarPorEmpleado(empleado_id):
+    # Obtiene el historial de tiempo de un empleado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -60,6 +62,7 @@ def mostrarPorEmpleado(empleado_id):
             con.desconectar()
 
 def consultaParticular(registro_id):
+    # Obtiene un registro de tiempo específico por ID
     con = None
     try:
         con = Conexion(host, user, password, db)

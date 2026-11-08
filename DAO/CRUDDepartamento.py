@@ -6,6 +6,7 @@ password = 'V3ntana.13'
 db = 'ecotech'
 
 def agregar(departamento):
+    # Inserta un departamento y devuelve su identificador generado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -30,6 +31,7 @@ def agregar(departamento):
             con.desconectar()
 
 def editar(departamento):
+    # Actualiza el nombre, gerente y descripción del departamento
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -58,6 +60,7 @@ def editar(departamento):
             con.desconectar()
 
 def eliminar(departamento_id):
+    # Elimina un departamento y devuelve si la operación tuvo efecto
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -74,6 +77,7 @@ def eliminar(departamento_id):
             con.desconectar()
 
 def mostrarTodos():
+    # Obtiene departamentos junto con el nombre de su gerente
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -97,6 +101,7 @@ def mostrarTodos():
             con.desconectar()
 
 def consultaParticular(departamento_id):
+    # Obtiene un departamento específico por ID
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -121,6 +126,7 @@ def consultaParticular(departamento_id):
 
 
 def existe_gerente_empleado(empleado_id):
+    # Comprueba que el empleado seleccionado pueda ser gerente
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -134,6 +140,7 @@ def existe_gerente_empleado(empleado_id):
             con.desconectar()
 
 def existe_departamentos():
+    # Indica si existe al menos un departamento registrado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -148,6 +155,7 @@ def existe_departamentos():
 
 
 def existe_departamento(departamento_id):
+    # Comprueba si existe el departamento indicado
     con = None
     try:
         con = Conexion(host, user, password, db)

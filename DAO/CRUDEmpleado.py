@@ -6,6 +6,7 @@ password = 'V3ntana.13'
 db = 'ecotech'
 
 def agregar(empleado):
+    # Inserta un empleado y devuelve su identificador generado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -36,6 +37,7 @@ def agregar(empleado):
             con.desconectar()
 
 def editar(empleado):
+    # Actualiza los datos personales y laborales de un empleado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -74,6 +76,7 @@ def editar(empleado):
             con.desconectar()
 
 def eliminar(empleado_id):
+    # Elimina un empleado y confirma si alguna fila fue afectada
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -90,6 +93,7 @@ def eliminar(empleado_id):
             con.desconectar()
 
 def mostrarTodos():
+    # Obtiene empleados junto con el nombre de su departamento
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -118,6 +122,7 @@ def mostrarTodos():
             con.desconectar()
 
 def consultaParticular(empleado_id):
+    # Obtiene un empleado por ID, incluyendo su departamento
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -146,6 +151,7 @@ def consultaParticular(empleado_id):
             con.desconectar()
 
 def existe_departamento(departamento_id):
+    # Comprueba si existe el departamento indicado
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -160,6 +166,7 @@ def existe_departamento(departamento_id):
 
 
 def existe_empleado(empleado_id):
+    # Comprueba si existe el empleado indicado
     con = None
     try:
         con = Conexion(host, user, password, db)

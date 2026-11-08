@@ -1,17 +1,20 @@
+# Autenticación local y consumo seguro de servicios públicos externos
 import re, getpass, bcrypt, requests
 from datetime import datetime
 from typing import Optional
 
 _USUARIOS = {
-    # Hash bcrypt: la contraseña nunca se almacena en texto plano.
+    # Hash bcrypt: la contraseña nunca se almacena en texto plano
     "admin": "$2b$12$mYjEYzUMHtAe9Poo9QJrnOig/HU/82WgsDjWXSKUmpe/yC.sICTMy",
 }
 
 class Sesion:
+    # Representa la sesión autenticada que habilita las consultas externas
     def __init__(self, usuario: str):
         self.usuario = usuario
 
 def autenticar(max_intentos: int = 3) -> Optional[Sesion]:
+    # Validar credenciales con bcrypt y devolver una sesión si son correctas
     for _ in range(max_intentos):
         usuario = input("Usuario: ").strip()
         contraseña = getpass.getpass("Contraseña: ")
@@ -32,25 +35,30 @@ def autenticar(max_intentos: int = 3) -> Optional[Sesion]:
     return None
 
 def _exigir_sesion(sesion: Optional[Sesion]) -> None:
+    # Impide consumir APIs cuando no existe una sesión autenticada
     if not isinstance(sesion, Sesion):
         raise PermissionError("Se requiere una sesión autenticada.")
 
 def _validar_ciudad(ciudad: str) -> str:
+    #Valida el texto de ciudad antes de enviarlo al servicio geográfico
     ciudad = ciudad.strip()
     if not ciudad or len(ciudad) > 100 or not re.fullmatch(r"[A-Za-zÀ-ÿ0-9 .,'-]+", ciudad):
         raise ValueError("Ciudad inválida.")
     return ciudad
 
 def _validar_moneda(moneda: str) -> str:
+    # Normaliza y valida un código de moneda de tres letras
     moneda = moneda.strip().upper()
     if not re.fullmatch(r"[A-Z]{3}", moneda):
         raise ValueError("Moneda inválida.")
     return moneda
 
 def consultar_clima(sesion: Optional[Sesion], ciudad: str) -> Optional[dict]:
+    # Obtiene el clima actual usando geocodificación y Open-Meteo
     _exigir_sesion(sesion)
     ciudad = _validar_ciudad(ciudad)
 
+    # Primero se convierten el nombre de la ciudad en coordenadas
     try:
         geocodificacion = requests.get(
             "https://geocoding-api.open-meteo.com/v1/search",
@@ -72,6 +80,7 @@ def consultar_clima(sesion: Optional[Sesion], ciudad: str) -> Optional[dict]:
     if geocodificacion.status_code != 200:
         raise RuntimeError("El servicio del clima no está disponible.")
 
+    # Luego se consultan las condiciones actuales de esas coordenadas
     try:
         lugares = geocodificacion.json().get("results", [])
         latitud = lugares[0]["latitude"]
@@ -112,6 +121,7 @@ def consultar_clima(sesion: Optional[Sesion], ciudad: str) -> Optional[dict]:
         raise RuntimeError("El servicio devolvió una respuesta inválida.")
 
 def consultar_tipo_cambio(sesion: Optional[Sesion], moneda: str) -> Optional[dict]:
+    # Obtiene USD/CLP y calcula el inverso cuando la moneda base es CLP
     _exigir_sesion(sesion)
     moneda = _validar_moneda(moneda)
     if moneda not in {"USD", "CLP"}:

@@ -6,6 +6,7 @@ password = 'V3ntana.13'
 db = 'ecotech'
 
 def agregar(asignacion):
+    # Crea una asignación de empleado a proyecto
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -31,6 +32,7 @@ def agregar(asignacion):
             con.desconectar()
 
 def eliminar(asignacion_id):
+    # Elimina una asignación y devuelve si la operación tuvo efecto
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -47,6 +49,7 @@ def eliminar(asignacion_id):
             con.desconectar()
 
 def mostrarTodos():
+    # Obtiene asignaciones con nombres de empleados y proyectos
     con = None
     try:
         con = Conexion(host, user, password, db)
@@ -74,6 +77,7 @@ def mostrarTodos():
 
 
 def mostrarPorEmpleado(empleado_id):
+    # Obtiene las asignaciones pertenecientes a un empleado
     con = None
     try:
         con = Conexion(host, user, password, db)

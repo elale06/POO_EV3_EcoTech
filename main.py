@@ -259,6 +259,7 @@ def menu_servicios():
     print("==========================")
 
 def gestion_servicios(sesion):
+    # Permite consultar APIs externas únicamente con una sesión válida
     while True:
         limpiar_pantalla()
         menu_servicios()
@@ -1004,6 +1005,7 @@ def gestion_asignacion():
             mostrar_asignaciones()
 def main():
     limpiar_pantalla()
+    # Ninguna operación del menú queda disponible sin autenticación
     sesion = autenticar()
     if sesion is None:
         return
