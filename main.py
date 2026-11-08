@@ -7,6 +7,7 @@ from DTO.Departamento import Departamento
 from DTO.Empleado import Empleado
 from DTO.Proyecto import Proyecto
 from DTO.RegistroTiempo import RegistroTiempo
+from seguridad_api import autenticar, consultar_clima, consultar_tipo_cambio
 
 def limpiar_pantalla():
     os.system("cls")
@@ -194,7 +195,8 @@ def menu_principal():
     print("3. Gestión de Proyectos")
     print("4. Registro de Tiempo")
     print("5. Asignación de empleado a proyectos")
-    print("6. Salir")
+    print("6. Consultar servicios externos")
+    print("7. Salir")
     print("==============================")
 
 def menu_empleados():
@@ -240,6 +242,40 @@ def menu_asignacion():
     print("3. Mostrar por empleado")
     print("4. Volver")
     print("====================================")
+
+def menu_servicios():
+    print("=== Servicios externos ===")
+    print("1. Consultar clima")
+    print("2. Consultar tipo de cambio")
+    print("3. Volver")
+    print("==========================")
+
+def gestion_servicios(sesion):
+    while True:
+        limpiar_pantalla()
+        menu_servicios()
+        opcion = leer_entero("Opción: ", minimo=0, maximo=3)
+
+        if opcion == 0 or opcion == 3:
+            return
+
+        try:
+            if opcion == 1:
+                ciudad = leer_texto("Ciudad: ")
+                clima = consultar_clima(sesion, ciudad)
+                print(
+                    f"{clima['ciudad']}: {clima['temperatura']} °C, "
+                    f"{clima['descripcion']}."
+                )
+            elif opcion == 2:
+                moneda = leer_texto("Moneda base (ej. USD): ")
+                tipo_cambio = consultar_tipo_cambio(sesion, moneda)
+                print(f"Tasas disponibles para {tipo_cambio['moneda']}:")
+                for codigo, valor in list(tipo_cambio["tasas"].items())[:10]:
+                    print(f"  {codigo}: {valor}")
+        except (ValueError, PermissionError, RuntimeError) as error:
+            print(error)
+        pausa()
 
 def ingresar_empleado():
     limpiar_pantalla()
@@ -957,12 +993,17 @@ def gestion_asignacion():
         elif opcion == 3:
             mostrar_asignaciones()
 def main():
+    limpiar_pantalla()
+    sesion = autenticar()
+    if sesion is None:
+        return
+
     while True:
         limpiar_pantalla()
         menu_principal()
-        opcion = leer_entero("INGRESE OPCIÓN : ", minimo=0, maximo=6)
+        opcion = leer_entero("INGRESE OPCIÓN : ", minimo=0, maximo=7)
 
-        if opcion == 0 or opcion == 6:
+        if opcion == 0 or opcion == 7:
             break
         elif opcion == 1:
             gestion_empleados()
@@ -974,6 +1015,8 @@ def main():
             gestion_tiempo()
         elif opcion == 5:
             gestion_asignacion()
+        elif opcion == 6:
+            gestion_servicios(sesion)
 
 if __name__ == "__main__":
     main()
