@@ -1,0 +1,5 @@
+pymysql
+bcrypt
+requests
+pwinput
+mysql-connector-python
