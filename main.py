@@ -123,14 +123,22 @@ def leer_id_existente(mensaje, existe_func, entidad, permitir_cancelar=False):
             return valor
         print(f"El {entidad} indicado no existe. Ingrese un ID válido o 0 para cancelar.")
 
-# Muestra los IDs disponibles para que el usuario elija uno válido.
+# Muestra los registros disponibles con su ID para que el usuario elija uno válido.
 def mostrar_ids_disponibles(entidad, datos):
     if not datos:
         print(f"No hay {entidad}s registrados.")
         return False
 
-    ids = [str(item[0]) for item in datos]
-    print(f"IDs disponibles ({entidad}): {', '.join(ids)}")
+    indice_nombre = {
+        "empleado": 2,
+        "departamento": 1,
+        "proyecto": 1,
+    }.get(entidad)
+
+    print(f"\n{entidad.capitalize()}s disponibles:")
+    for item in datos:
+        nombre = f" - {item[indice_nombre]}" if indice_nombre is not None else ""
+        print(f"ID: {item[0]}{nombre}")
     return True
 
 # Pregunta de confirmación antes de borrar un registro.
