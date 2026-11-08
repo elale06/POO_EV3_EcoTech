@@ -4,7 +4,7 @@ from typing import Optional
 
 _USUARIOS = {
     # Hash bcrypt: la contraseña nunca se almacena en texto plano.
-    "admin": "$2b$12$hSYnSuaZb4RveCZnMVJAl.EHkcBfR3V4BjQPqpq.KNKVTafdYEGS2",
+    "admin": "$2b$12$mYjEYzUMHtAe9Poo9QJrnOig/HU/82WgsDjWXSKUmpe/yC.sICTMy",
 }
 
 class Sesion:
