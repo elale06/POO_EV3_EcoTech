@@ -1,4 +1,5 @@
-import os, re, getpass, bcrypt, requests
+import re, getpass, bcrypt, requests
+from datetime import datetime
 from typing import Optional
 
 _USUARIOS = {
@@ -34,12 +35,6 @@ def _exigir_sesion(sesion: Optional[Sesion]) -> None:
     if not isinstance(sesion, Sesion):
         raise PermissionError("Se requiere una sesión autenticada.")
 
-def _obtener_api_key(nombre: str) -> str:
-    api_key = os.getenv(nombre, "").strip()
-    if not api_key:
-        raise RuntimeError("Servicio no configurado.")
-    return api_key
-
 def _validar_ciudad(ciudad: str) -> str:
     ciudad = ciudad.strip()
     if not ciudad or len(ciudad) > 100 or not re.fullmatch(r"[A-Za-zÀ-ÿ0-9 .,'-]+", ciudad):
@@ -55,16 +50,15 @@ def _validar_moneda(moneda: str) -> str:
 def consultar_clima(sesion: Optional[Sesion], ciudad: str) -> Optional[dict]:
     _exigir_sesion(sesion)
     ciudad = _validar_ciudad(ciudad)
-    api_key = _obtener_api_key("OPENWEATHER_API_KEY")
 
     try:
-        respuesta = requests.get(
-            "https://api.openweathermap.org/data/2.5/weather",
+        geocodificacion = requests.get(
+            "https://geocoding-api.open-meteo.com/v1/search",
             params={
-                "q": ciudad,
-                "appid": api_key,
-                "units": "metric",
-                "lang": "es",
+                "name": ciudad,
+                "count": 1,
+                "language": "es",
+                "format": "json",
             },
             timeout=10,
         )
@@ -75,29 +69,26 @@ def consultar_clima(sesion: Optional[Sesion], ciudad: str) -> Optional[dict]:
     except requests.exceptions.RequestException:
         raise RuntimeError("No fue posible consultar el servicio.")
 
-    if respuesta.status_code == 404:
-        raise RuntimeError("No se encontró la ciudad indicada.")
-    if respuesta.status_code != 200:
+    if geocodificacion.status_code != 200:
         raise RuntimeError("El servicio del clima no está disponible.")
 
     try:
-        datos = respuesta.json()
-        return {
-            "ciudad": datos["name"],
-            "temperatura": datos["main"]["temp"],
-            "descripcion": datos["weather"][0]["description"],
-        }
+        lugares = geocodificacion.json().get("results", [])
+        latitud = lugares[0]["latitude"]
+        longitud = lugares[0]["longitude"]
+        nombre = lugares[0]["name"]
     except (ValueError, KeyError, IndexError, TypeError):
-        raise RuntimeError("El servicio devolvió una respuesta inválida.")
-
-def consultar_tipo_cambio(sesion: Optional[Sesion], moneda: str) -> Optional[dict]:
-    _exigir_sesion(sesion)
-    moneda = _validar_moneda(moneda)
-    api_key = _obtener_api_key("EXCHANGE_RATE_API_KEY")
+        raise RuntimeError("No se encontró la ciudad indicada.")
 
     try:
         respuesta = requests.get(
-            f"https://v6.exchangerate-api.com/v6/{api_key}/latest/{moneda}",
+            "https://api.open-meteo.com/v1/forecast",
+            params={
+                "latitude": latitud,
+                "longitude": longitud,
+                "current": "temperature_2m,weather_code",
+                "timezone": "auto",
+            },
             timeout=10,
         )
     except requests.exceptions.Timeout:
@@ -107,18 +98,49 @@ def consultar_tipo_cambio(sesion: Optional[Sesion], moneda: str) -> Optional[dic
     except requests.exceptions.RequestException:
         raise RuntimeError("No fue posible consultar el servicio.")
 
-    if respuesta.status_code == 404:
-        raise RuntimeError("La moneda indicada no está disponible.")
+    if respuesta.status_code != 200:
+        raise RuntimeError("El servicio del clima no está disponible.")
+
+    try:
+        actual = respuesta.json()["current"]
+        return {
+            "ciudad": nombre,
+            "temperatura": actual["temperature_2m"],
+            "codigo_clima": actual["weather_code"],
+        }
+    except (ValueError, KeyError, IndexError, TypeError):
+        raise RuntimeError("El servicio devolvió una respuesta inválida.")
+
+def consultar_tipo_cambio(sesion: Optional[Sesion], moneda: str) -> Optional[dict]:
+    _exigir_sesion(sesion)
+    moneda = _validar_moneda(moneda)
+    if moneda not in {"USD", "CLP"}:
+        raise ValueError("Solo se admite USD o CLP en este indicador.")
+
+    try:
+        respuesta = requests.get(
+            f"https://indicadores.cl/api/v1/historico/dolar/{datetime.now().year}.json",
+            timeout=10,
+        )
+    except requests.exceptions.Timeout:
+        raise RuntimeError("El servicio tardó demasiado en responder.")
+    except requests.exceptions.ConnectionError:
+        raise RuntimeError("No fue posible conectar con el servicio.")
+    except requests.exceptions.RequestException:
+        raise RuntimeError("No fue posible consultar el servicio.")
+
     if respuesta.status_code != 200:
         raise RuntimeError("El servicio económico no está disponible.")
 
     try:
-        datos = respuesta.json()
-        if datos.get("result") != "success":
+        serie = respuesta.json()["serie"]
+        if not serie:
             raise RuntimeError("El servicio económico no está disponible.")
+        ultimo = serie[-1]
         return {
-            "moneda": datos["base_code"],
-            "tasas": datos["conversion_rates"],
+            "moneda": moneda,
+            "fecha": ultimo["fecha"],
+            "valor_clp": 1 if moneda == "CLP" else ultimo["valor"],
         }
     except (ValueError, KeyError, TypeError):
         raise RuntimeError("El servicio devolvió una respuesta inválida.")

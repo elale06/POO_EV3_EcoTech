@@ -265,14 +265,15 @@ def gestion_servicios(sesion):
                 clima = consultar_clima(sesion, ciudad)
                 print(
                     f"{clima['ciudad']}: {clima['temperatura']} °C, "
-                    f"{clima['descripcion']}."
+                    f"código meteorológico {clima['codigo_clima']}."
                 )
             elif opcion == 2:
-                moneda = leer_texto("Moneda base (ej. USD): ")
+                moneda = leer_texto("Moneda (USD o CLP): ")
                 tipo_cambio = consultar_tipo_cambio(sesion, moneda)
-                print(f"Tasas disponibles para {tipo_cambio['moneda']}:")
-                for codigo, valor in list(tipo_cambio["tasas"].items())[:10]:
-                    print(f"  {codigo}: {valor}")
+                print(
+                    f"1 {tipo_cambio['moneda']} = {tipo_cambio['valor_clp']} CLP "
+                    f"(fecha: {tipo_cambio['fecha']})."
+                )
         except (ValueError, PermissionError, RuntimeError) as error:
             print(error)
         pausa()
