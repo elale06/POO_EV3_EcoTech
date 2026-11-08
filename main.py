@@ -271,7 +271,8 @@ def gestion_servicios(sesion):
                 moneda = leer_texto("Moneda (USD o CLP): ")
                 tipo_cambio = consultar_tipo_cambio(sesion, moneda)
                 print(
-                    f"1 {tipo_cambio['moneda']} = {tipo_cambio['valor_clp']} CLP "
+                    f"1 {tipo_cambio['moneda']} = "
+                    f"{tipo_cambio['valor']:.6f} {tipo_cambio['moneda_destino']} "
                     f"(fecha: {tipo_cambio['fecha']})."
                 )
         except (ValueError, PermissionError, RuntimeError) as error:

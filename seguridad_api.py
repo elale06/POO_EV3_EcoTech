@@ -137,10 +137,16 @@ def consultar_tipo_cambio(sesion: Optional[Sesion], moneda: str) -> Optional[dic
         if not serie:
             raise RuntimeError("El servicio económico no está disponible.")
         ultimo = serie[-1]
+        valor_usd_clp = float(ultimo["valor"])
         return {
             "moneda": moneda,
             "fecha": ultimo["fecha"],
-            "valor_clp": 1 if moneda == "CLP" else ultimo["valor"],
+            "valor": (
+                valor_usd_clp
+                if moneda == "USD"
+                else 1 / valor_usd_clp
+            ),
+            "moneda_destino": "CLP" if moneda == "USD" else "USD",
         }
     except (ValueError, KeyError, TypeError):
         raise RuntimeError("El servicio devolvió una respuesta inválida.")
