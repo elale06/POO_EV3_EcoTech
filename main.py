@@ -211,7 +211,7 @@ def menu_principal(sesion):
     print("==============================")
 
 def autenticar_usuario(max_intentos=3):
-    for _ in range(max_intentos):
+    for intento in range(1, max_intentos + 1):
         username = leer_texto("Usuario: ")
         contraseña = getpass("Contraseña: ")
         usuario = Usuario.login(username, contraseña)
@@ -219,7 +219,8 @@ def autenticar_usuario(max_intentos=3):
             print(f"\nBienvenido {usuario.nombre}")
             pausa()
             return Sesion(usuario.username, usuario.tipo_usuario)
-        print("Credenciales inválidas.")
+        intentos_restantes = max_intentos - intento
+        print(f"Credenciales inválidas. Intentos restantes: {intentos_restantes}.")
 
     print("No fue posible iniciar sesión.")
     pausa()
@@ -261,8 +262,11 @@ def menu_acceso():
         print("3. Salir")
         opcion = leer_entero("Opción: ", minimo=1, maximo=3)
         if opcion == 1:
-            return autenticar_usuario()
-        if opcion == 2:
+            sesion = autenticar_usuario()
+            if sesion is not None:
+                return sesion
+            continue
+        elif opcion == 2:
             registrar_usuario()
         else:
             return None
