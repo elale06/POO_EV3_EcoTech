@@ -239,12 +239,12 @@ def registrar_usuario():
     nombre = leer_texto("Nombre: ")
     apellido = leer_texto("Apellido: ")
     email = leer_texto("Correo: ")
-    tipo = leer_texto("Tipo (Empleado): ")
-    if tipo != "Empleado":
-        print("El registro público solo permite crear usuarios Empleado.")
-        print("Los usuarios Administrador deben ser creados por un administrador.")
-        pausa()
-        return
+    if Usuario.existen_usuarios():
+        tipo = "Empleado"
+        print("Usuario registrado como Empleado.")
+    else:
+        tipo = "Administrador"
+        print("Primera cuenta: se registrará como Administrador.")
 
     if Usuario.registrar_usuario(username, contraseña, nombre, apellido, email, tipo):
         print("Usuario registrado correctamente.")

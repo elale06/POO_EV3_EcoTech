@@ -21,6 +21,7 @@ puede registrar y consultar tiempos, consultar asignaciones y usar los
 servicios externos. Las operaciones de empleados, departamentos, proyectos y
 los cambios de asignaciones están restringidos al Administrador.
 
-El registro público solo crea usuarios Empleado. Las cuentas antiguas con tipo
-distinto de los tipos admitidos deben actualizarse directamente en la base de
-datos antes de iniciar sesión.
+La primera cuenta registrada se crea como `Administrador`, permitiendo iniciar
+el sistema sin usuarios preconfigurados. Las cuentas siguientes se crean como
+`Empleado`; un Administrador puede gestionar las cuentas administrativas desde
+la base de datos si se requiere otra.

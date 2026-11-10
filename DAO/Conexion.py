@@ -59,6 +59,16 @@ class Conexion:
             print("Error al obtener usuario:", e)
             return None
 
+    def existenUsuarios(self):
+        try:
+            if not self.db or not self.cursor:
+                return False
+            cursor = self.ejecuta_query("SELECT 1 FROM usuarios LIMIT 1")
+            return bool(cursor and cursor.fetchone())
+        except Exception as e:
+            print("Error al verificar usuarios:", e)
+            return False
+
     # --------------------------------------------
     def agregarUsuario(self, username, password_hash, nombre, apellido, email, tipo_usuario):
         try:

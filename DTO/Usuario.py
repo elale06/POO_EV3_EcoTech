@@ -82,3 +82,16 @@ class Usuario:
         finally:
             if con:
                 con.desconectar()
+
+    @staticmethod
+    def existen_usuarios():
+        con = None
+        try:
+            con = Conexion(host, user, passwordS, db)
+            return bool(con and con.db and con.existenUsuarios())
+        except Exception as e:
+            print("Error al verificar usuarios:", e)
+            return False
+        finally:
+            if con:
+                con.desconectar()
