@@ -1,6 +1,7 @@
 import os, re
 from getpass import getpass
 from datetime import datetime
+from decimal import Decimal, InvalidOperation
 
 from DAO import CRUDAsignacion_emp, CRUDDepartamento, CRUDEmpleado, CRUDProyecto, CRUDTiempo
 from DTO.AsignacionEmp import AsignacionEmp
@@ -33,6 +34,19 @@ def leer_entero(mensaje, minimo=None, maximo=None, permitir_vacio=False, valor_p
             return valor
         except ValueError:
             print("Ingrese un número válido.")
+
+def leer_monto(mensaje, valor_por_defecto=Decimal("1")):
+    while True:
+        texto = input(mensaje).strip().replace(",", ".")
+        if texto == "":
+            return valor_por_defecto
+        try:
+            monto = Decimal(texto)
+            if not monto.is_finite() or monto < 0:
+                raise InvalidOperation
+            return monto
+        except InvalidOperation:
+            print("Ingrese un monto válido mayor o igual a 0.")
 
 def leer_texto(mensaje, permitir_vacio=False, valor_por_defecto=None):
     texto = input(mensaje).strip()
@@ -201,6 +215,7 @@ def menu_principal(sesion):
     print("        MENÚ PRINCIPAL        ")
     print("==============================")
     print(f"Usuario: {sesion.usuario} | Tipo: {sesion.tipo_usuario}")
+    print("==============================")
     print("1. Gestión de Empleados (Administrador)")
     print("2. Gestión de Departamentos (Administrador)")
     print("3. Gestión de Proyectos (Administrador)")
@@ -345,10 +360,14 @@ def gestion_servicios(sesion):
                 )
             elif opcion == 2:
                 moneda = leer_texto("Moneda (USD o CLP): ")
+                cantidad = leer_monto(
+                    "Cantidad a convertir (Enter para consultar el valor de 1): "
+                )
                 tipo_cambio = consultar_tipo_cambio(sesion, moneda)
+                convertido = cantidad * Decimal(str(tipo_cambio["valor"]))
                 print(
-                    f"1 {tipo_cambio['moneda']} = "
-                    f"{tipo_cambio['valor']:.6f} {tipo_cambio['moneda_destino']} "
+                    f"{cantidad:g} {tipo_cambio['moneda']} = "
+                    f"{convertido:.6f} {tipo_cambio['moneda_destino']} "
                     f"(fecha: {tipo_cambio['fecha']})."
                 )
         except (ValueError, PermissionError, RuntimeError) as error:
