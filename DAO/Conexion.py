@@ -42,3 +42,34 @@ class Conexion:
         # Reviente la transacción actual cuando ocurre un error
         if self.db:
             self.db.rollback()
+
+        # --------------------------------------------
+    def obtenerUsuario(self, username):
+        try:
+            if not self.db or not self.cursor:
+                return None
+            sql = "SELECT * FROM usuarios WHERE username = %s"
+            cursor = self.ejecuta_query(sql, (username,))
+            if cursor:
+                return cursor.fetchone()
+            return None
+        except Exception as e:
+            print("Error al obtener usuario:", e)
+            return None
+
+    # --------------------------------------------
+    def agregarUsuario(self, username, password_hash, nombre, apellido, email, tipo_usuario):
+        try:
+            sql = """INSERT INTO usuarios
+            (username, password_hash, nombre, apellido, email, tipo_usuario)
+            VALUES(%s, %s, %s, %s, %s, %s)"""
+
+            valores = (username, password_hash, nombre, apellido, email, tipo_usuario)
+
+            self.ejecuta_query(sql, valores)
+            self.commit()
+            return True
+        except Exception as e:
+            print("Error al agregar usuario:", e)
+            self.rollback()
+            return False
