@@ -196,13 +196,14 @@ def mostrar_proyectos_existentes():
         print(f"{proyecto[0]} - {proyecto[1]}")
     return True
 
-def menu_principal():
+def menu_principal(sesion):
     print("==============================")
     print("        MENÚ PRINCIPAL        ")
     print("==============================")
-    print("1. Gestión de Empleados")
-    print("2. Gestión de Departamentos")
-    print("3. Gestión de Proyectos")
+    print(f"Usuario: {sesion.usuario} | Tipo: {sesion.tipo_usuario}")
+    print("1. Gestión de Empleados (Administrador)")
+    print("2. Gestión de Departamentos (Administrador)")
+    print("3. Gestión de Proyectos (Administrador)")
     print("4. Registro de Tiempo")
     print("5. Asignación de empleado a proyectos")
     print("6. Consultar servicios externos")
@@ -217,7 +218,7 @@ def autenticar_usuario(max_intentos=3):
         if usuario:
             print(f"\nBienvenido {usuario.nombre}")
             pausa()
-            return Sesion(usuario.username)
+            return Sesion(usuario.username, usuario.tipo_usuario)
         print("Credenciales inválidas.")
 
     print("No fue posible iniciar sesión.")
@@ -238,9 +239,10 @@ def registrar_usuario():
     nombre = leer_texto("Nombre: ")
     apellido = leer_texto("Apellido: ")
     email = leer_texto("Correo: ")
-    tipo = leer_texto("Tipo (Administrador/Vendedor): ")
-    if tipo not in {"Administrador", "Vendedor"}:
-        print("Tipo de usuario inválido.")
+    tipo = leer_texto("Tipo (Empleado): ")
+    if tipo != "Empleado":
+        print("El registro público solo permite crear usuarios Empleado.")
+        print("Los usuarios Administrador deben ser creados por un administrador.")
         pausa()
         return
 
@@ -300,10 +302,14 @@ def menu_tiempo():
     print("3. Volver")
     print("=================")
 
-def menu_asignacion():
+def menu_asignacion(sesion):
     print("=== Asignaciones Empleado-Proyecto ===")
-    print("1. Asignar")
-    print("2. Desasignar")
+    if sesion.tipo_usuario == "Administrador":
+        print("1. Asignar")
+        print("2. Desasignar")
+    else:
+        print("1. Asignar (Administrador)")
+        print("2. Desasignar (Administrador)")
     print("3. Mostrar por empleado")
     print("4. Volver")
     print("====================================")
@@ -1046,20 +1052,31 @@ def gestion_tiempo():
             ingresar_registro_tiempo()
         elif opcion == 2:
             mostrar_registros_por_empleado()
-def gestion_asignacion():
+def gestion_asignacion(sesion):
     while True:
         limpiar_pantalla()
-        menu_asignacion()
+        menu_asignacion(sesion)
         opcion = leer_entero("Opción: ", minimo=0, maximo=4)
 
         if opcion == 0 or opcion == 4:
             break
-        elif opcion == 1:
+        elif opcion == 1 and sesion.tipo_usuario == "Administrador":
             asignar_empleado_a_proyecto()
-        elif opcion == 2:
+        elif opcion == 2 and sesion.tipo_usuario == "Administrador":
             desasignar_empleado_de_proyecto()
         elif opcion == 3:
             mostrar_asignaciones()
+        elif opcion in {1, 2}:
+            print("Esta operación solo está disponible para Administradores.")
+            pausa()
+
+def exigir_administrador(sesion):
+    if sesion.tipo_usuario != "Administrador":
+        print("Esta sección solo está disponible para Administradores.")
+        pausa()
+        return False
+    return True
+
 def main():
     limpiar_pantalla()
     # Ninguna operación del menú queda disponible sin autenticación
@@ -1069,21 +1086,24 @@ def main():
 
     while True:
         limpiar_pantalla()
-        menu_principal()
+        menu_principal(sesion)
         opcion = leer_entero("INGRESE OPCIÓN : ", minimo=0, maximo=7)
 
         if opcion == 0 or opcion == 7:
             break
         elif opcion == 1:
-            gestion_empleados()
+            if exigir_administrador(sesion):
+                gestion_empleados()
         elif opcion == 2:
-            gestion_departamentos()
+            if exigir_administrador(sesion):
+                gestion_departamentos()
         elif opcion == 3:
-            gestion_proyectos()
+            if exigir_administrador(sesion):
+                gestion_proyectos()
         elif opcion == 4:
             gestion_tiempo()
         elif opcion == 5:
-            gestion_asignacion()
+            gestion_asignacion(sesion)
         elif opcion == 6:
             gestion_servicios(sesion)
 

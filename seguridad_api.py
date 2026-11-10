@@ -1,38 +1,13 @@
 # Autenticación local y consumo seguro de servicios públicos externos
-import re, getpass, bcrypt, requests
+import re, requests
 from datetime import datetime
 from typing import Optional
 
-_USUARIOS = {
-    # Hash bcrypt: la contraseña nunca se almacena en texto plano
-    "admin": "$2b$12$mYjEYzUMHtAe9Poo9QJrnOig/HU/82WgsDjWXSKUmpe/yC.sICTMy",
-}
-
 class Sesion:
     # Representa la sesión autenticada que habilita las consultas externas
-    def __init__(self, usuario: str):
+    def __init__(self, usuario: str, tipo_usuario: str):
         self.usuario = usuario
-
-def autenticar(max_intentos: int = 3) -> Optional[Sesion]:
-    # Validar credenciales con bcrypt y devolver una sesión si son correctas
-    for _ in range(max_intentos):
-        usuario = input("Usuario: ").strip()
-        contraseña = getpass.getpass("Contraseña: ")
-
-        if not usuario or not contraseña:
-            print("El usuario y la contraseña son obligatorios.")
-            continue
-
-        hash_guardado = _USUARIOS.get(usuario)
-        if hash_guardado and bcrypt.checkpw(
-            contraseña.encode("utf-8"), hash_guardado.encode("utf-8")
-        ):
-            return Sesion(usuario)
-
-        print("Credenciales inválidas.")
-
-    print("No fue posible iniciar sesión.")
-    return None
+        self.tipo_usuario = tipo_usuario
 
 def _exigir_sesion(sesion: Optional[Sesion]) -> None:
     # Impide consumir APIs cuando no existe una sesión autenticada

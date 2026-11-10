@@ -7,13 +7,21 @@ passwordS = 'V3ntana.13'
 db = 'ecotech'
 
 class Usuario:
+    TIPOS_VALIDOS = {"Administrador", "Empleado"}
+
     def __init__(self, username, password_hash, nombre, apellido, email, tipo_usuario):
         self.username = username
         self.password_hash = password_hash
         self.nombre = nombre
         self.apellido = apellido
         self.email = email
-        self.tipo_usuario = tipo_usuario
+        self.tipo_usuario = self.normalizar_tipo(tipo_usuario)
+
+    @staticmethod
+    def normalizar_tipo(tipo_usuario):
+        if tipo_usuario not in Usuario.TIPOS_VALIDOS:
+            raise ValueError("Tipo de usuario inválido.")
+        return tipo_usuario
 
     @staticmethod # Método estático para iniciar sesión (no requiere instancia de la clase)
     def login(username, password):
@@ -51,6 +59,7 @@ class Usuario:
     def registrar_usuario(username, password, nombre, apellido, email, tipo_usuario):
         con = None
         try:
+            tipo_usuario = Usuario.normalizar_tipo(tipo_usuario)
             hashed_password = bcrypt.hashpw(
                 password.encode('utf-8'),
                 bcrypt.gensalt()

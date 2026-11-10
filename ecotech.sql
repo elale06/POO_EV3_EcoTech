@@ -35,7 +35,7 @@ CREATE TABLE `usuarios` (
   `nombre` varchar(50) NOT NULL,
   `apellido` varchar(100) NOT NULL,
   `email` varchar(100) NOT NULL,
-  `tipo_usuario` enum('Administrador','Vendedor') NOT NULL,
+  `tipo_usuario` enum('Administrador','Empleado') NOT NULL,
   `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 
@@ -45,7 +45,7 @@ CREATE TABLE `usuarios` (
 
 INSERT INTO `usuarios` (`id`, `username`, `password_hash`, `nombre`, `apellido`, `email`, `tipo_usuario`, `fecha_registro`) VALUES
 (1, 'elale066', '$2b$12$6KkkbFMmuTd6hJVM90KYWu4mzZqbYYDWehWTmpXS9qnIHSNA1KYSq', 'Alexander', 'Pinto Billiet', 'alexander.pinto03@inacapmail.cl', 'Administrador', '2026-10-28 15:26:51'),
-(2, 'pancho', '$2b$12$uX2/Phqp0fNZmriSvG4TbuHd0JM.i1naAveo4WUCkBVLegjJSxts2', 'pancho', 'pancho', 'pancho', 'Vendedor', '2026-10-28 15:34:13');
+(2, 'pancho', '$2b$12$uX2/Phqp0fNZmriSvG4TbuHd0JM.i1naAveo4WUCkBVLegjJSxts2', 'pancho', 'pancho', 'pancho', 'Empleado', '2026-10-28 15:34:13');
 
 --
 -- Estructura de tabla para la tabla `asignacion_emp`
