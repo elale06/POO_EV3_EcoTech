@@ -1,4 +1,5 @@
 import os, re
+from getpass import getpass
 from datetime import datetime
 
 from DAO import CRUDAsignacion_emp, CRUDDepartamento, CRUDEmpleado, CRUDProyecto, CRUDTiempo
@@ -7,7 +8,8 @@ from DTO.Departamento import Departamento
 from DTO.Empleado import Empleado
 from DTO.Proyecto import Proyecto
 from DTO.RegistroTiempo import RegistroTiempo
-from seguridad_api import autenticar, consultar_clima, consultar_tipo_cambio
+from DTO.Usuario import Usuario
+from seguridad_api import Sesion, consultar_clima, consultar_tipo_cambio
 
 def limpiar_pantalla():
     os.system("cls")
@@ -207,6 +209,61 @@ def menu_principal():
     print("7. Salir")
     print("==============================")
 
+def autenticar_usuario(max_intentos=3):
+    for _ in range(max_intentos):
+        username = leer_texto("Usuario: ")
+        contraseña = getpass("Contraseña: ")
+        usuario = Usuario.login(username, contraseña)
+        if usuario:
+            print(f"\nBienvenido {usuario.nombre}")
+            pausa()
+            return Sesion(usuario.username)
+        print("Credenciales inválidas.")
+
+    print("No fue posible iniciar sesión.")
+    pausa()
+    return None
+
+def registrar_usuario():
+    limpiar_pantalla()
+    print("=== Registrar usuario ===")
+    username = leer_texto("Usuario: ")
+    contraseña = getpass("Contraseña: ")
+    confirmacion = getpass("Repetir contraseña: ")
+    if contraseña != confirmacion:
+        print("Las contraseñas no coinciden.")
+        pausa()
+        return
+
+    nombre = leer_texto("Nombre: ")
+    apellido = leer_texto("Apellido: ")
+    email = leer_texto("Correo: ")
+    tipo = leer_texto("Tipo (Administrador/Vendedor): ")
+    if tipo not in {"Administrador", "Vendedor"}:
+        print("Tipo de usuario inválido.")
+        pausa()
+        return
+
+    if Usuario.registrar_usuario(username, contraseña, nombre, apellido, email, tipo):
+        print("Usuario registrado correctamente.")
+    else:
+        print("No se pudo registrar el usuario.")
+    pausa()
+
+def menu_acceso():
+    while True:
+        limpiar_pantalla()
+        print("=== ACCESO ===")
+        print("1. Iniciar sesión")
+        print("2. Registrar usuario")
+        print("3. Salir")
+        opcion = leer_entero("Opción: ", minimo=1, maximo=3)
+        if opcion == 1:
+            return autenticar_usuario()
+        if opcion == 2:
+            registrar_usuario()
+        else:
+            return None
 def menu_empleados():
     print("=== Empleados ===")
     print("1. Ingresar empleado")
@@ -1006,7 +1063,7 @@ def gestion_asignacion():
 def main():
     limpiar_pantalla()
     # Ninguna operación del menú queda disponible sin autenticación
-    sesion = autenticar()
+    sesion = menu_acceso()
     if sesion is None:
         return
 

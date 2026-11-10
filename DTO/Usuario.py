@@ -4,7 +4,7 @@ import bcrypt
 host = 'localhost'
 user = 'userempresa'
 passwordS = 'V3ntana.13'
-db = 'empresa'
+db = 'ecotech'
 
 class Usuario:
     def __init__(self, username, password_hash, nombre, apellido, email, tipo_usuario):

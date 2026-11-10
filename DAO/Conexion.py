@@ -19,6 +19,8 @@ class Conexion:
     def ejecuta_query(self, sql, valores=None):
         # Ejecuta SQL parametrizado para evitar concatenar valores de usuario
         try:
+            if not self.cursor:
+                return None
             if valores:
                 self.cursor.execute(sql, valores)
             else:
@@ -66,7 +68,10 @@ class Conexion:
 
             valores = (username, password_hash, nombre, apellido, email, tipo_usuario)
 
-            self.ejecuta_query(sql, valores)
+            cursor = self.ejecuta_query(sql, valores)
+            if not cursor:
+                self.rollback()
+                return False
             self.commit()
             return True
         except Exception as e:
