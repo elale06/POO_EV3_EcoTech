@@ -48,6 +48,13 @@ def leer_monto(mensaje, valor_por_defecto=Decimal("1")):
         except InvalidOperation:
             print("Ingrese un monto válido mayor o igual a 0.")
 
+def leer_moneda(mensaje):
+    while True:
+        moneda = input(mensaje).strip().upper()
+        if moneda in {"USD", "CLP"}:
+            return moneda
+        print("Moneda inválida. Ingrese USD o CLP.")
+
 def leer_texto(mensaje, permitir_vacio=False, valor_por_defecto=None):
     texto = input(mensaje).strip()
     if texto == "" and permitir_vacio:
@@ -359,7 +366,7 @@ def gestion_servicios(sesion):
                     f"código meteorológico {clima['codigo_clima']}."
                 )
             elif opcion == 2:
-                moneda = leer_texto("Moneda (USD o CLP): ")
+                moneda = leer_moneda("Moneda (USD o CLP): ")
                 cantidad = leer_monto(
                     "Cantidad a convertir (Enter para consultar el valor de 1): "
                 )
@@ -367,7 +374,7 @@ def gestion_servicios(sesion):
                 convertido = cantidad * Decimal(str(tipo_cambio["valor"]))
                 print(
                     f"{cantidad:g} {tipo_cambio['moneda']} = "
-                    f"{convertido:.6f} {tipo_cambio['moneda_destino']} "
+                    f"{convertido:.2f} {tipo_cambio['moneda_destino']} "
                     f"(fecha: {tipo_cambio['fecha']})."
                 )
         except (ValueError, PermissionError, RuntimeError) as error:
