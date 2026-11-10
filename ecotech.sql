@@ -25,6 +25,29 @@ SET time_zone = "+00:00";
 -- --------------------------------------------------------
 
 --
+-- Estructura de tabla para la tabla `usuarios`
+--
+
+CREATE TABLE `usuarios` (
+  `id` int(11) NOT NULL,
+  `username` varchar(50) NOT NULL,
+  `password_hash` varchar(255) NOT NULL,
+  `nombre` varchar(50) NOT NULL,
+  `apellido` varchar(100) NOT NULL,
+  `email` varchar(100) NOT NULL,
+  `tipo_usuario` enum('Administrador','Vendedor') NOT NULL,
+  `fecha_registro` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Volcado de datos para la tabla `usuarios`
+--
+
+INSERT INTO `usuarios` (`id`, `username`, `password_hash`, `nombre`, `apellido`, `email`, `tipo_usuario`, `fecha_registro`) VALUES
+(1, 'elale066', '$2b$12$6KkkbFMmuTd6hJVM90KYWu4mzZqbYYDWehWTmpXS9qnIHSNA1KYSq', 'Alexander', 'Pinto Billiet', 'alexander.pinto03@inacapmail.cl', 'Administrador', '2026-10-28 15:26:51'),
+(2, 'pancho', '$2b$12$uX2/Phqp0fNZmriSvG4TbuHd0JM.i1naAveo4WUCkBVLegjJSxts2', 'pancho', 'pancho', 'pancho', 'Vendedor', '2026-10-28 15:34:13');
+
+--
 -- Estructura de tabla para la tabla `asignacion_emp`
 --
 
@@ -100,6 +123,12 @@ CREATE TABLE `tiempo` (
 --
 
 --
+-- Indices de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indices de la tabla `asignacion_emp`
 --
 ALTER TABLE `asignacion_emp`
@@ -132,6 +161,13 @@ ALTER TABLE `tiempo`
 --
 -- AUTO_INCREMENT de las tablas volcadas
 --
+
+--
+-- AUTO_INCREMENT de la tabla `usuarios`
+--
+ALTER TABLE `usuarios`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+COMMIT;
 
 --
 -- AUTO_INCREMENT de la tabla `asignacion_emp`
